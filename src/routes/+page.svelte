@@ -6,4 +6,4 @@
 
 </script>
 
-<h1 class="text-purple-600">test</h1>
+<h1 class="text-purple-600">{data.props.message}</h1>
