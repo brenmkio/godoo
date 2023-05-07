@@ -1,5 +1,7 @@
 <script lang="ts">
-	import '../app.postcss';
+    import '../app.postcss'
 </script>
 
-<slot />
+<a href="/">Home</a>
+  
+ <slot />

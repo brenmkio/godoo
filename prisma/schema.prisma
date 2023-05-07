@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -13,4 +14,234 @@ model test {
   id         BigInt    @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   message    String?
+}
+
+model Event {
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @db.VarChar
+  description           String?                 @db.VarChar
+  location              String                  @db.VarChar
+  start_time            DateTime                @db.Timestamp(6)
+  end_time              DateTime                @db.Timestamp(6)
+  event_type            String                  @db.VarChar
+  parent_event_id       Int?
+  host_id               Int
+  Profile               Profile                 @relation(fields: [host_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Event                 Event?                  @relation("EventToEvent", fields: [parent_event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_Event           Event[]                 @relation("EventToEvent")
+  EventFile             EventFile[]
+  EventGroup            EventGroup[]
+  EventInterest         EventInterest[]
+  EventSchedule         EventSchedule[]
+  EventStat             EventStat[]
+  GroupEventAssociation GroupEventAssociation[]
+  Match                 Match[]
+  UserEventInteraction  UserEventInteraction[]
+}
+
+model EventFile {
+  id       Int    @id @default(autoincrement())
+  event_id Int
+  url      String @db.VarChar
+  Event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model EventGroup {
+  id       Int   @id @default(autoincrement())
+  event_id Int
+  group_id Int
+  Event    Event @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Group    Group @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model EventInterest {
+  id          Int      @id @default(autoincrement())
+  event_id    Int
+  interest_id Int
+  Event       Event    @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Interest    Interest @relation(fields: [interest_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model EventSchedule {
+  id         Int      @id @default(autoincrement())
+  event_id   Int
+  start_time DateTime @db.Timestamp(6)
+  end_time   DateTime @db.Timestamp(6)
+  Event      Event    @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model EventStat {
+  id       Int   @id @default(autoincrement())
+  event_id Int
+  stat_id  Int
+  value    Float
+  Event    Event @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Stat     Stat  @relation(fields: [stat_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model FriendRequest {
+  id                                         Int     @id @default(autoincrement())
+  sender_id                                  Int
+  receiver_id                                Int
+  status                                     String  @default("pending") @db.VarChar
+  Profile_FriendRequest_receiver_idToProfile Profile @relation("FriendRequest_receiver_idToProfile", fields: [receiver_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Profile_FriendRequest_sender_idToProfile   Profile @relation("FriendRequest_sender_idToProfile", fields: [sender_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Group {
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @db.VarChar
+  description           String?                 @db.VarChar
+  avatar_url            String?                 @db.VarChar
+  private               Boolean                 @default(false)
+  group_type            String                  @db.VarChar
+  EventGroup            EventGroup[]
+  GroupEventAssociation GroupEventAssociation[]
+  GroupInterest         GroupInterest[]
+  GroupMember           GroupMember[]
+}
+
+model GroupEventAssociation {
+  id       Int   @id @default(autoincrement())
+  group_id Int
+  event_id Int
+  Event    Event @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Group    Group @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model GroupInterest {
+  id          Int      @id @default(autoincrement())
+  group_id    Int
+  interest_id Int
+  Group       Group    @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Interest    Interest @relation(fields: [interest_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model GroupMember {
+  id         Int     @id @default(autoincrement())
+  group_id   Int
+  profile_id Int
+  role       String  @default("member") @db.VarChar
+  Group      Group   @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Profile    Profile @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Interest {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar
+  category        String?           @db.VarChar
+  EventInterest   EventInterest[]
+  GroupInterest   GroupInterest[]
+  ProfileInterest ProfileInterest[]
+}
+
+model Match {
+  id        Int         @id @default(autoincrement())
+  event_id  Int
+  timestamp DateTime    @db.Timestamp(6)
+  Event     Event       @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  MatchStat MatchStat[]
+}
+
+model MatchStat {
+  id       Int   @id @default(autoincrement())
+  match_id Int
+  stat_id  Int
+  value    Float
+  Match    Match @relation(fields: [match_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Stat     Stat  @relation(fields: [stat_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Message {
+  id                                   Int      @id @default(autoincrement())
+  content                              String   @db.VarChar
+  sender_id                            Int
+  receiver_id                          Int
+  timestamp                            DateTime @db.Timestamp(6)
+  Profile_Message_receiver_idToProfile Profile  @relation("Message_receiver_idToProfile", fields: [receiver_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Profile_Message_sender_idToProfile   Profile  @relation("Message_sender_idToProfile", fields: [sender_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Profile {
+  id                                                Int               @id @default(autoincrement())
+  first_name                                        String            @db.VarChar
+  last_name                                         String            @db.VarChar
+  avatar_url                                        String?           @db.VarChar
+  bio                                               String?           @db.VarChar
+  user_id                                           Int?              @unique
+  birthday                                          DateTime?         @db.Date
+  location                                          String?           @db.VarChar
+  private                                           Boolean           @default(false)
+  Event                                             Event[]
+  FriendRequest_FriendRequest_receiver_idToProfile  FriendRequest[]   @relation("FriendRequest_receiver_idToProfile")
+  FriendRequest_FriendRequest_sender_idToProfile    FriendRequest[]   @relation("FriendRequest_sender_idToProfile")
+  GroupMember                                       GroupMember[]
+  Message_Message_receiver_idToProfile              Message[]         @relation("Message_receiver_idToProfile")
+  Message_Message_sender_idToProfile                Message[]         @relation("Message_sender_idToProfile")
+  User                                              User?             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ProfileFollow_ProfileFollow_follower_idToProfile  ProfileFollow[]   @relation("ProfileFollow_follower_idToProfile")
+  ProfileFollow_ProfileFollow_following_idToProfile ProfileFollow[]   @relation("ProfileFollow_following_idToProfile")
+  ProfileInterest                                   ProfileInterest[]
+  SocialLink                                        SocialLink[]
+}
+
+model ProfileFollow {
+  id                                          Int     @id @default(autoincrement())
+  follower_id                                 Int
+  following_id                                Int
+  Profile_ProfileFollow_follower_idToProfile  Profile @relation("ProfileFollow_follower_idToProfile", fields: [follower_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Profile_ProfileFollow_following_idToProfile Profile @relation("ProfileFollow_following_idToProfile", fields: [following_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model ProfileInterest {
+  id          Int      @id @default(autoincrement())
+  profile_id  Int
+  interest_id Int
+  Interest    Interest @relation(fields: [interest_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Profile     Profile  @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SocialLink {
+  id         Int     @id @default(autoincrement())
+  profile_id Int
+  platform   String  @db.VarChar
+  url        String  @db.VarChar
+  Profile    Profile @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Stat {
+  id                Int         @id @default(autoincrement())
+  name              String      @db.VarChar
+  description       String?     @db.VarChar
+  increment         Float
+  determines_winner Boolean
+  EventStat         EventStat[]
+  MatchStat         MatchStat[]
+}
+
+model User {
+  id                       Int                       @id @default(autoincrement())
+  username                 String                    @unique
+  email                    String                    @unique @db.VarChar
+  password                 String                    @db.VarChar
+  notification_settings_id Int?
+  Profile                  Profile?
+  UserNotificationSettings UserNotificationSettings? @relation(fields: [notification_settings_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  UserEventInteraction     UserEventInteraction[]
+}
+
+model UserEventInteraction {
+  id       Int    @id @default(autoincrement())
+  user_id  Int
+  event_id Int
+  status   String @db.VarChar
+  Event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User     User   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UserNotificationSettings {
+  id                  Int     @id @default(autoincrement())
+  email_notifications Boolean @default(true)
+  push_notifications  Boolean @default(true)
+  User                User[]
 }
