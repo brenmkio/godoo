@@ -1,8 +1,8 @@
 <script lang="ts">
 
-  import type { PageData } from './$types';
+  import type { PageData } from './$types'
 
-  export let data: PageData;
+  export let data: PageData
 
 </script>
 
@@ -15,8 +15,17 @@
 {/if}
 
 <div class="flex flex-col mt-4">
-  <a href="/edit-u">Edit User</a>
-  <a href="/new-u">New User</a>
-  <a href="/u">List of Users</a>
-  <a href="/u/test">Test User</a>
+  {#if data.session}
+    <p>Welcome, {data.session.user.email}</p>
+    <a href="/edit-p">Edit Profile</a>
+    <a href="/new-p">New Profile</a>
+    <a href="/u">List of Users</a>
+    <a href="/u/test">Test User</a>
+    <form action="/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+  {:else}
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+  {/if}
 </div>
