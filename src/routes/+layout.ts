@@ -16,8 +16,10 @@ import {
     })
   
     const {
-      data: { session }
+      data: { session, myUser }
     } = await supabase.auth.getSession()
+
   
-    return { supabase, session }
+  
+    return { supabase, session, myUser }
   }

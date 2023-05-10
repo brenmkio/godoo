@@ -1,10 +1,37 @@
-import { AuthApiError } from "@supabase/supabase-js"
+import { AuthApiError, type Provider } from "@supabase/supabase-js"
 import type { Actions } from "./$types"
 import { fail, redirect } from "@sveltejs/kit"
 
+const OAUTH_PROVIDERS = ["google", "discord"]
+
 export const actions: Actions = {
 
-    login: async ({ request, locals }) => {
+    login: async ({ request, locals, url }) => {
+
+        const provider = url.searchParams.get('provider') as Provider
+
+        if (provider) {
+            if (!OAUTH_PROVIDERS.includes(provider)) {
+                return fail(400, {
+                    error: 'Provider not supported.'
+                })
+            }
+            const { data, error: err } = await locals.supabase.auth.signInWithOAuth({
+                provider: provider
+            })
+
+            if (err) {
+                console.log(err)
+                return fail(400, {
+                    message: 'Something went wrong.'
+                })
+            }
+
+            // all good up to here
+
+            throw redirect(303, data.url)
+        }
+
         const body = Object.fromEntries(await request.formData())
 
         const { data, error: err } = await locals.supabase.auth.signInWithPassword({
