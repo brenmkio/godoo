@@ -2,23 +2,20 @@
   import '../app.postcss'
   import type { LayoutData } from './$types'
 	import { onMount } from 'svelte'
-	import { invalidate } from '$app/navigation'
+	import { invalidateAll } from '$app/navigation'
 
   export let data: LayoutData
 
-  $: ({ supabase, session, myUser } = data)
+  $: ({ supabase, session, myUser, myProfile } = data)
 
     onMount(() => {
-      console.log("URL hash: ", window.location.hash)
 
       const { 
         data: { subscription }
       } = supabase.auth.onAuthStateChange((event, _session) => {
-        console.log ("Auth event: ", event)
-        console.log ("Auth session: ", _session)
 
         if (_session?.expires_at !== session?.expires_at) {
-          invalidate('supabase:auth');
+          invalidateAll()
         }
       })
 
@@ -31,8 +28,8 @@
 
 <div id="main_app" class="bg-slate-100 px-2 w-screen h-screen">
   <a href="/">Home</a>
-  {#if myUser} 
-  <p>Welcome back {myUser?.username}</p>
+  {#if myProfile || myUser} 
+  <p>Welcome back {"buddy"}</p>
   {/if}
   
   <slot />

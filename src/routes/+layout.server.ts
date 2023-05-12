@@ -1,8 +1,12 @@
 import type { LayoutServerLoad } from "./$types"
 
-export const load: LayoutServerLoad = async ({ locals: { getSession }}) => {
-    console.log("LAYOUT.SERVER.TS")
+export const load: LayoutServerLoad = async ({ locals }) => {
+    const session = await locals.getSession()
+
+    const myUser = locals.user
+    const myProfile = locals.profile
+
     return {
-        session: await getSession(),
+        session, myUser, myProfile
     }
 }

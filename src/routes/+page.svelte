@@ -35,7 +35,10 @@
 
 <div class="flex flex-col mt-4">
   {#if data.session}
-    <p>Welcome, {data.session.user.email}</p>
+    <p>Welcome!</p>
+    <p>auth user: {data.session.user.email}</p>
+    <p>my user: {data.myUser?.username}</p>
+    <p>my profile: {data.myProfile?.handle}</p>
     <a href="/edit-p">Edit Profile</a>
     <a href="/new-p">New Profile</a>
     <a href="/u">List of Users</a>
@@ -44,7 +47,7 @@
       <button type="submit">Logout</button>
     </form>
   {:else}
-    <a href="/login">Login</a>
+    <a href="/login?backTo=u%2Ftest">Login</a>
     <a href="/register">Register</a>
   {/if}
 </div>
