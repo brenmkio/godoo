@@ -181,7 +181,7 @@ model Profile {
   GroupMember                                       GroupMember[]
   Message_Message_receiver_idToProfile              Message[]         @relation("Message_receiver_idToProfile")
   Message_Message_sender_idToProfile                Message[]         @relation("Message_sender_idToProfile")
-  User_Profile_user_idToUser                        User?             @relation("Profile_user_idToUser", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User_Profile_user_idToUser  User?  @relation("Profile_user_idToUser", fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   ProfileFollow_ProfileFollow_follower_idToProfile  ProfileFollow[]   @relation("ProfileFollow_follower_idToProfile")
   ProfileFollow_ProfileFollow_following_idToProfile ProfileFollow[]   @relation("ProfileFollow_following_idToProfile")
   ProfileInterest                                   ProfileInterest[]

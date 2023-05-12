@@ -3,9 +3,8 @@ import {
     PUBLIC_SUPABASE_ANON_KEY
   } from '$env/static/public';
   import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
-  import type { Handle } from '@sveltejs/kit';
+  import { redirect, type Handle } from '@sveltejs/kit';
   import { DB_getProfileByID, DB_getUserByEmail } from '$lib/db';
-  import type { User } from '@prisma/client';
   
   export const handle: Handle = async ({ event, resolve }) => {
 
@@ -32,7 +31,7 @@ import {
     const session = await event.locals.getSession()
     if (session) {
 
-      const authEmail = session?.user.email || ''
+      const authEmail = session.user.email || ''
       const { db_data, db_error } = await DB_getUserByEmail(authEmail)
       if (db_error) {
         if (event.locals.errors) {
@@ -48,7 +47,7 @@ import {
 
     if (event.locals.user) {
       const currentProfileID = event.locals.user.current_profile_id || -1
-      const { db_data, db_error } = await DB_getProfileByID(currentProfileID)
+      const { db_data, db_error } = await DB_getProfileByID(currentProfileID.toString())
       if (db_error) {
         if (event.locals.errors) {
           event.locals.errors.push(db_error)
@@ -58,6 +57,10 @@ import {
       } else {
         event.locals.profile = db_data
       }
+    }
+
+    if (!event.url.pathname.startsWith('/onboard') && !event.url.pathname.startsWith('/api') && session && !event.locals.user) {
+      throw redirect(303, '/onboard')
     }
   
     // (step 3) render route and generate response (also step 6)

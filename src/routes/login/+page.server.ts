@@ -3,8 +3,12 @@ import type { Actions } from "./$types"
 import { fail, redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
     const backTo = url.searchParams.get('backTo') || '/'
+
+    if (locals.profile) {
+        throw redirect(303, "/")
+    }
 
     return {
         backTo

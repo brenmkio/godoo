@@ -8,6 +8,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const testHandle = url.searchParams.get('handle') || ""
 
     const result = await DB_checkHandle(testHandle);
+    console.log("CHECK HANDLE: " + JSON.stringify(result))
     if (result.error) {
         return new Response(result.error?.message, {
             status: 500,
