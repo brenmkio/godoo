@@ -1,37 +1,36 @@
 <script lang="ts">
-	import { applyAction } from '$app/forms';
-    import type { ActionData, PageData, SubmitFunction } from './$types';
+
+    import type { PageData } from './$types'
+	import { onMount } from 'svelte'
+	import { goto } from '$app/navigation'
+
     import { superForm } from 'sveltekit-superforms/client'
     import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte'
-    import { onboardSchema } from '$lib/zod';
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-    import { ZodError } from 'zod';
+    import { onboardSchema } from '$lib/zod'
 
     export let data: PageData
 
     let displayName = ''
-    let handle = ''
     let avatarUrl = ''
     let handleAvailable: boolean | null = null
     let inputElement: HTMLInputElement
+
 
     const { form, enhance, errors, constraints } = superForm(data.form, {
         taintedMessage: null,
         validators: onboardSchema
     })
 
-    let loading = false
-
-   
-
     const handleInput = async () => {
-        handleAvailable = null
+        if (!$errors.handle) {
+            handleAvailable = null
 
-        const res = await fetch('/api/checkHandleAvailability?handle=' + $form.handle)
-        const handleRes = await res.json()
-        handleAvailable = handleRes.available
+            const res = await fetch('/api/checkHandleAvailability?handle=' + $form.handle)
+            const handleRes = await res.json()
+            handleAvailable = handleRes.available
 
+        }
+        
         if (inputElement) {
             inputElement.blur()
             inputElement.focus()
@@ -40,7 +39,6 @@
 
     onMount(async () => {
         if (!data.session?.user) {
-            // go to an error page, no session.user shouldn't happen
             goto('/')
         }
 
@@ -59,7 +57,7 @@
 
 <SuperDebug data={$form} />
 
-<form method="POST" action="?/onboard" use:enhance>
+<form method="POST" action="?/onboard" use:enhance class="flex flex-col w-64">
     <label for="name">Handle</label>
     <input
         type="text"
@@ -79,14 +77,14 @@
         <p class="text-yellow-600">checking handle...</p>
     {/if}
 
-    <label for="display">Display Name</label>
+    <label for="name">Display Name</label>
     <input
         type="text"
-        name="display"
-        data-invalid={$errors.display}
-        bind:value={$form.display}
-        {...$constraints.display} />
-    {#if $errors.display}<span class="text-red-500">{$errors.display}</span>{/if}
+        name="name"
+        data-invalid={$errors.name}
+        bind:value={$form.name}
+        {...$constraints.name} />
+    {#if $errors.name}<span class="text-red-500">{$errors.name}</span>{/if}
 
     <div><button>Submit</button></div>
 </form>

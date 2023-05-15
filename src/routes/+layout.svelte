@@ -28,9 +28,6 @@
 
 <div id="main_app" class="bg-slate-100 px-2 w-screen h-screen">
   <a href="/">Home</a>
-  {#if myProfile || myUser} 
-  <p>Welcome back {"buddy"}</p>
-  {/if}
   
   <slot />
 </div>

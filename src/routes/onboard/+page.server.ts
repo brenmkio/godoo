@@ -3,7 +3,7 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
 import { DB_addProfile, DB_addUser, DB_updateUser } from "$lib/db"
-import { generateTempUsername } from "$lib/utils"
+import { generateTempUsername } from "$lib/utilsServer"
 
 export const load: PageServerLoad = async (event) => {
 
@@ -14,14 +14,15 @@ export const load: PageServerLoad = async (event) => {
         throw redirect(303, "/")
     }
 
+    const session = await event.locals.getSession()
+    if (!session) {
+        throw redirect(303, "/")
+    }
+
     return { form }
 
     // can prepopulate with stuff from db: https://superforms.vercel.app/get-started
 
-}
-
-async function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export const actions: Actions = {
@@ -64,7 +65,7 @@ export const actions: Actions = {
 
         const returnedProfile = await DB_addProfile({
             handle: form.data.handle,
-            name: form.data.display,
+            name: form.data.name,
             User_Profile_user_idToUser: {
                 connect: { id: userId },
             },

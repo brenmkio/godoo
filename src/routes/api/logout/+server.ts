@@ -9,5 +9,8 @@ export const POST: RequestHandler = async ({ locals }) => {
         throw error(500, "Something went wrong while logging you out")
     }
 
+    locals.profile = null
+    locals.user = null
+
     throw redirect(303, '/')
 }

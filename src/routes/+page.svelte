@@ -43,7 +43,7 @@
     <a href="/new-p">New Profile</a>
     <a href="/u">List of Users</a>
     <a href="/u/test">Test User</a>
-    <form action="/logout" method="POST" use:enhance={submitLogout}>
+    <form action="/api/logout" method="POST" use:enhance={submitLogout}>
       <button type="submit">Logout</button>
     </form>
   {:else}

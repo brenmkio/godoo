@@ -148,6 +148,29 @@ export async function DB_updateUser(
     }
   }
 
+  export async function DB_updateProfile(
+      id: number,
+      data: Prisma.ProfileUpdateInput
+    ): Promise<DBReturn<Profile>> {
+      try {
+        const updatedProfile = await prisma.profile.update({
+          where: { id },
+          data,
+        })
+    
+        return { db_data: updatedProfile, db_error: null }
+      } catch (error) {
+        return {
+          db_data: null,
+          db_error: {
+            statusCode: 500,
+            name: `update profile error`,
+            message: `update profile error: ${String(error)}`,
+          },
+        }
+      }
+    }
+
 
 
 
