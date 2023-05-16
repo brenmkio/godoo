@@ -26,9 +26,14 @@
 
 </script>
 
-<div id="main_app" class="bg-slate-100 px-2 w-screen h-screen">
-  <a href="/">Home</a>
-  
-  <slot />
+<div id="main_app" class="bg-slate-100 w-screen h-screen">
+  <div class="w-full bg-slate-300 h-6 flex items-center p-4 space-x-2">
+    <a href="/">Home</a>
+    <a href="/edit-u">{myUser?.username}</a>
+    <a href="/edit-p">My Profile</a>
+  </div>
+  <div class="p-4">
+    <slot />
+  </div>
 </div>
 

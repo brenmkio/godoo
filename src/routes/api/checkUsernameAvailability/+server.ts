@@ -1,12 +1,12 @@
 import type { RequestHandler } from "./$types";
-import { DB_checkHandle } from "$lib/db";
+import { DB_checkUsername } from "$lib/db";
 
 export const GET: RequestHandler = async ({ url }) => {
 
     let available = false
-    const testHandle = url.searchParams.get('handle') || ""
+    const testUsername = url.searchParams.get('username') || ""
 
-    const result = await DB_checkHandle(testHandle);
+    const result = await DB_checkUsername(testUsername);
     if (result.error) {
         return new Response(result.error?.message, {
             status: 500,

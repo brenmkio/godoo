@@ -66,8 +66,8 @@ export const actions: Actions = {
         const returnedProfile = await DB_addProfile({
             handle: form.data.handle,
             name: form.data.name,
-            User_Profile_user_idToUser: {
-                connect: { id: userId },
+            User_Profile_parent_idToUser: {
+              connect: { id: userId }
             },
         })
 

@@ -7,6 +7,8 @@
 
     export let data: PageData
 
+    const { profileCount } = data
+
     let handleAvailable: boolean | null = null
     let inputElement: HTMLInputElement
 
@@ -70,7 +72,9 @@
 
         if (inputElement) {
             inputElement.blur()
-            inputElement.focus()
+            if (document.activeElement === inputElement) {
+                inputElement.focus()
+            }
         }
     }
 
@@ -92,12 +96,12 @@
 
 
 <h1>Edit Profile</h1>
-<p>Welcome {myProfile?.name}</p>
+<p>Welcome {myProfile?.name}, you have {profileCount} profile{profileCount === 1 ? "" : "s"}</p>
 
 <SuperDebug data={$form} />
 
 
-<form method="POST" action="?/editProfile" class="flex flex-col w-64">
+<form method="POST" action="?/submitProfile" class="flex flex-col w-64">
     <label for="name">Handle</label>
     <input
         type="text"
@@ -272,6 +276,4 @@
         <p class="text-yellow-600">Any fields with errors won't be updated</p>
     {/if}
 </form>
-
-<a href="/new-p">NEW PROFILE</a>
 

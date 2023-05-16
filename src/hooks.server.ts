@@ -47,7 +47,7 @@ import {
 
     if (event.locals.user) {
       const currentProfileID = event.locals.user.current_profile_id || -1
-      const { db_data, db_error } = await DB_getProfileByID(currentProfileID.toString())
+      const { db_data, db_error } = await DB_getProfileByID(currentProfileID)
       if (db_error) {
         if (event.locals.errors) {
           event.locals.errors.push(db_error)

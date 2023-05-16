@@ -36,13 +36,11 @@
 <div class="flex flex-col mt-4">
   {#if data.session}
     <p>Welcome!</p>
-    <p>auth user: {data.session.user.email}</p>
-    <p>my user: {data.myUser?.username}</p>
-    <p>my profile: {data.myProfile?.handle}</p>
-    <a href="/edit-p">Edit Profile</a>
-    <a href="/new-p">New Profile</a>
-    <a href="/u">List of Users</a>
-    <a href="/u/test">Test User</a>
+    <a href="/profiles">List of Profiles</a>
+    <a href="/events">List of Events</a>
+    <a href="/new-e">Create Event</a>
+    <a href="/groups">List of Groups</a>
+    <a href="/new-g">Create Group</a>
     <form action="/api/logout" method="POST" use:enhance={submitLogout}>
       <button type="submit">Logout</button>
     </form>

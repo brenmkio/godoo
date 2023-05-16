@@ -21,13 +21,20 @@ model Event {
   description           String?                 @db.VarChar
   end_time              DateTime                @db.Timestamp(6)
   event_type            String                  @db.VarChar
-  host_id               Int
   location              String                  @db.VarChar
   name                  String                  @db.VarChar
   parent_event_id       Int?
   start_time            DateTime                @db.Timestamp(6)
-  Profile               Profile                 @relation(fields: [host_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  Event                 Event?                  @relation("EventToEvent", fields: [parent_event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  icon                  String?
+  banner                String?
+  status                Int?                    @db.SmallInt
+  minimum_attendance    Int?
+  maximum_attendance    Int?
+  optimal_attendance    Int?
+  slug                  String
+  creator               Int?
+  Profile               Profile?                @relation(fields: [creator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Event                 Event?                  @relation("EventToEvent", fields: [parent_event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   other_Event           Event[]                 @relation("EventToEvent")
   EventFile             EventFile[]
   EventGroup            EventGroup[]
@@ -95,7 +102,14 @@ model Group {
   avatar_url            String?                 @db.VarChar
   private               Boolean                 @default(false)
   group_type            String                  @db.VarChar
+  parent_group          Int?
+  creation_date         DateTime                @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
+  location              String?
+  status                Int?                    @db.SmallInt
+  slug                  String
   EventGroup            EventGroup[]
+  Group                 Group?                  @relation("GroupToGroup", fields: [parent_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_Group           Group[]                 @relation("GroupToGroup")
   GroupEventAssociation GroupEventAssociation[]
   GroupInterest         GroupInterest[]
   GroupMember           GroupMember[]
@@ -166,7 +180,6 @@ model Profile {
   id                                                Int               @id @default(autoincrement())
   avatar_url                                        String?           @db.VarChar
   bio                                               String?           @db.VarChar
-  user_id                                           Int?              @unique
   birthday                                          DateTime?         @db.Date
   location                                          String?           @db.VarChar
   private                                           Boolean           @default(false)
@@ -175,13 +188,14 @@ model Profile {
   name                                              String            @db.VarChar
   pronouns                                          String?
   updated_at                                        DateTime          @updatedAt
+  parent_id                                         Int?
   Event                                             Event[]
   FriendRequest_FriendRequest_receiver_idToProfile  FriendRequest[]   @relation("FriendRequest_receiver_idToProfile")
   FriendRequest_FriendRequest_sender_idToProfile    FriendRequest[]   @relation("FriendRequest_sender_idToProfile")
   GroupMember                                       GroupMember[]
   Message_Message_receiver_idToProfile              Message[]         @relation("Message_receiver_idToProfile")
   Message_Message_sender_idToProfile                Message[]         @relation("Message_sender_idToProfile")
-  User_Profile_user_idToUser  User?  @relation("Profile_user_idToUser", fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  User_Profile_parent_idToUser                      User?             @relation("Profile_parent_idToUser", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ProfileFollow_ProfileFollow_follower_idToProfile  ProfileFollow[]   @relation("ProfileFollow_follower_idToProfile")
   ProfileFollow_ProfileFollow_following_idToProfile ProfileFollow[]   @relation("ProfileFollow_following_idToProfile")
   ProfileInterest                                   ProfileInterest[]
@@ -231,7 +245,7 @@ model User {
   settings                                 String                    @default("none")
   user_status                              String                    @default("active")
   current_profile_id                       Int?
-  Profile_Profile_user_idToUser            Profile?                  @relation("Profile_user_idToUser")
+  Profile_Profile_parent_idToUser          Profile[]                 @relation("Profile_parent_idToUser")
   Profile_User_current_profile_idToProfile Profile?                  @relation("User_current_profile_idToProfile", fields: [current_profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   UserNotificationSettings                 UserNotificationSettings? @relation(fields: [notification_settings_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   UserEventInteraction                     UserEventInteraction[]

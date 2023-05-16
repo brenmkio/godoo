@@ -1,12 +1,18 @@
 import type { RequestHandler } from "./$types";
-import { DB_checkHandle } from "$lib/db";
+import { DB_checkEventSlug, DB_checkGroupSlug, DB_checkHandle } from "$lib/db";
 
 export const GET: RequestHandler = async ({ url }) => {
 
     let available = false
-    const testHandle = url.searchParams.get('handle') || ""
+    const testSlug = url.searchParams.get('slug') || ""
+    const testTable = url.searchParams.get('t') || ""
 
-    const result = await DB_checkHandle(testHandle);
+    let result: any = null
+    if (testTable === "e") {
+        result = await DB_checkEventSlug(testSlug)
+    } else if (testTable === "g") {
+        result = await DB_checkGroupSlug(testSlug)
+    }
     if (result.error) {
         return new Response(result.error?.message, {
             status: 500,
