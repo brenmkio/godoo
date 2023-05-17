@@ -68,11 +68,9 @@
 
         }
 
-        if (inputElement) {
+        if (inputElement && document.activeElement === inputElement) {
             inputElement.blur()
-            if (document.activeElement === inputElement) {
-                inputElement.focus()
-            }
+            inputElement.focus()
         }
     }
 
@@ -101,7 +99,7 @@
 
 <SuperDebug data={$form} />
 
-<form method="POST" action="?/editGroup" class="flex flex-col w-64">
+<form method="POST" class="flex flex-col w-64">
     <label for="name">Slug</label>
     <input
         type="text"

@@ -10,6 +10,6 @@
 
 {#if events}
 {#each events as anEvent }
-<p>#{anEvent.id}: <a href="/e/{anEvent.slug}">@{anEvent.slug}</a> - {anEvent.name}</p>
+<p>#{anEvent.id}: <a href="/e/{anEvent.slug}">@{anEvent.slug}</a> - {anEvent.name} ({anEvent.event_type})</p>
 {/each}
 {/if}

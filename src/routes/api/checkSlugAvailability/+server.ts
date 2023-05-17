@@ -1,5 +1,5 @@
 import type { RequestHandler } from "./$types";
-import { DB_checkEventSlug, DB_checkGroupSlug, DB_checkHandle } from "$lib/db";
+import { DB_checkEventSlug, DB_checkGroupSlug, DB_checkHandle } from "$lib/db_check";
 
 export const GET: RequestHandler = async ({ url }) => {
 

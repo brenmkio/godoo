@@ -1,6 +1,6 @@
 
 
-import { DB_getUserByUsername } from './db';
+import { DB_getUserByUsername } from './db_get';
 
 
 export async function generateTempUsername(email: string): Promise<string> {

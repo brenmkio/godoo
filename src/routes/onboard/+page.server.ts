@@ -2,7 +2,8 @@ import { onboardSchema } from "$lib/zod.js"
 import { setError, superValidate } from "sveltekit-superforms/server"
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
-import { DB_addProfile, DB_addUser, DB_updateUser } from "$lib/db"
+import { DB_addProfile, DB_addUser } from "$lib/db_add"
+import { DB_updateUser } from "$lib/db_update"
 import { generateTempUsername } from "$lib/utilsServer"
 
 export const load: PageServerLoad = async (event) => {

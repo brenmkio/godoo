@@ -1,6 +1,6 @@
 
 import type { PageServerLoad } from './$types';
-import { DB_getEventBySlug } from '$lib/db';
+import { DB_getEventBySlug } from '$lib/db_get';
 import type { Event } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 

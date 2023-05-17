@@ -1,6 +1,7 @@
 import { error, fail, redirect } from "@sveltejs/kit"
 import type { RequestHandler } from "./$types"
-import { DB_getProfileByHandle, DB_getProfileByID, DB_updateUser } from "$lib/db";
+import { DB_getProfileByHandle } from "$lib/db_get"
+import { DB_updateUser } from "$lib/db_update"
 import type { Profile } from "@prisma/client";
 
 export const POST: RequestHandler = async ({ locals, url }) => {

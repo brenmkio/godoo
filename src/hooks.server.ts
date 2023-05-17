@@ -4,7 +4,7 @@ import {
   } from '$env/static/public';
   import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
   import { redirect, type Handle } from '@sveltejs/kit';
-  import { DB_getProfileByID, DB_getUserByEmail } from '$lib/db';
+  import { DB_getProfileByID, DB_getUserByEmail } from '$lib/db_get';
   
   export const handle: Handle = async ({ event, resolve }) => {
 

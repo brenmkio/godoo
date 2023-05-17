@@ -3,7 +3,8 @@ import { setError, setMessage, superValidate } from "sveltekit-superforms/server
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
 import { objConvertNullToUndefined } from "$lib/utilsClient"
-import { DB_getEventById, DB_getEventBySlug, DB_updateEvent } from "$lib/db"
+import { DB_getEventById, DB_getEventBySlug } from "$lib/db_get"
+import { DB_updateEvent } from "$lib/db_update"
 import type { Prisma, Event } from "@prisma/client"
 import { updated } from "$app/stores"
 import type { DBReturn } from "$lib/types"
@@ -48,7 +49,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 
 
-    editEvent: async (event) => {
+    default: async (event) => {
         const form = await superValidate(event, editEventSchema)
         // form has: valid bool, errors obj, data obj, empty bool, constraints obj
 
@@ -150,7 +151,8 @@ export const actions: Actions = {
 
             db_return = await DB_updateEvent(theEvent.id, updateData)
     
-            if (db_return.db_error) {
+            if (db_return.db_error) { 
+                console.log("DB ERROR: " + db_return.db_error.message)
                 setError(form, null, db_return.db_error.message)
                 return fail(500, { form });
             }
@@ -162,9 +164,11 @@ export const actions: Actions = {
             } else {
                 setMessage(form, "Your event was updated successfully")
             }
-            return { form }
-        }
 
+            console.log("why not: " + db_return.db_data?.slug)
+            throw redirect(303, "/e/" + db_return.db_data?.slug)
+        }
+        console.log("HUH")
         setError(form, null, "Nothing was able to be updated, please check the errors")
         return fail(400, { form })
 

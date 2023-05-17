@@ -1,6 +1,6 @@
 
 import type { PageServerLoad } from './$types';
-import { DB_getProfileByHandle } from '$lib/db';
+import { DB_getProfileByHandle } from '$lib/db_get';
 import type { Profile } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 

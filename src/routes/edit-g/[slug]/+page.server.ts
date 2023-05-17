@@ -3,7 +3,8 @@ import { setError, setMessage, superValidate } from "sveltekit-superforms/server
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
 import { objConvertNullToUndefined } from "$lib/utilsClient"
-import { DB_getGroupById, DB_getGroupBySlug, DB_updateGroup, DB_updateProfile } from "$lib/db"
+import { DB_getGroupById, DB_getGroupBySlug } from "$lib/db_get"
+import { DB_updateGroup } from "$lib/db_update"
 import type { Group, Prisma, Profile } from "@prisma/client"
 import type { DBReturn } from "$lib/types"
 
@@ -45,7 +46,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 
 
-    editGroup: async (event) => {
+    default: async (event) => {
         const form = await superValidate(event, editGroupSchema)
         // form has: valid bool, errors obj, data obj, empty bool, constraints obj
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { EventType } from '$lib/types'
 
 export const loginSchema = z.object({
     email: z.string(),
@@ -38,6 +39,8 @@ export const newEventSchema = z.object({
     name: z.string().min(3).max(60),
     slug: z.string().min(3).max(20),
     start_time: z.date(),
+    event_type: z.enum(["GeneralEvent", "Tournament", "Bracket", "Match", "Game", "null"]),
+    continuation_of: z.number(),
 })
 
 export const editEventSchema = z.object({

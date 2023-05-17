@@ -16,7 +16,13 @@
 {/if}
 
 {#if theEvent}
-<p>Slug: {theEvent.slug}</p>
-<p>Name: {theEvent.name}</p>
-<p>Location: {theEvent.location}</p>
+  <p>Slug: {theEvent.slug}</p>
+  <p>Name: {theEvent.name}</p>
+  <p>Location: {theEvent.location}</p>
+  <p>Type: {theEvent.event_type}</p>
+  {#if theEvent.continuation_of}
+    <p>Continuation of {theEvent.continuation_of}</p>
+  {/if}
+  <p>Status: {theEvent.status}</p>
+  <a href="/edit-e/{theEvent.slug}">EDIT EVENT</a>
 {/if}

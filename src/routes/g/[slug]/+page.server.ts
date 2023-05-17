@@ -1,6 +1,6 @@
 
 import type { PageServerLoad } from './$types';
-import { DB_getGroupBySlug } from '$lib/db';
+import { DB_getGroupBySlug } from '$lib/db_get';
 import type { Group } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 

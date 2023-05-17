@@ -3,7 +3,7 @@ import { setError, setMessage, superValidate } from "sveltekit-superforms/server
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
 import { objConvertNullToUndefined } from "$lib/utilsClient"
-import { DB_updateProfile } from "$lib/db"
+import { DB_updateProfile } from "$lib/db_update"
 import type { Prisma, Profile } from "@prisma/client"
 import { updated } from "$app/stores"
 import type { DBReturn } from "$lib/types"

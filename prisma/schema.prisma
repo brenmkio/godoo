@@ -17,33 +17,41 @@ model test {
 }
 
 model Event {
-  id                    Int                     @id @default(autoincrement())
-  description           String?                 @db.VarChar
-  end_time              DateTime                @db.Timestamp(6)
-  event_type            String                  @db.VarChar
-  location              String                  @db.VarChar
-  name                  String                  @db.VarChar
-  parent_event_id       Int?
-  start_time            DateTime                @db.Timestamp(6)
-  icon                  String?
-  banner                String?
-  status                Int?                    @db.SmallInt
-  minimum_attendance    Int?
-  maximum_attendance    Int?
-  optimal_attendance    Int?
-  slug                  String
-  creator               Int?
-  Profile               Profile?                @relation(fields: [creator], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Event                 Event?                  @relation("EventToEvent", fields: [parent_event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_Event           Event[]                 @relation("EventToEvent")
-  EventFile             EventFile[]
-  EventGroup            EventGroup[]
-  EventInterest         EventInterest[]
-  EventSchedule         EventSchedule[]
-  EventStat             EventStat[]
-  GroupEventAssociation GroupEventAssociation[]
-  Match                 Match[]
-  UserEventInteraction  UserEventInteraction[]
+  id                                       Int                     @id @default(autoincrement())
+  description                              String?                 @db.VarChar
+  end_time                                 DateTime?               @db.Timestamp(6)
+  event_type                               String?
+  location                                 String?                 @db.VarChar
+  name                                     String                  @db.VarChar
+  parent_event_id                          Int?
+  start_time                               DateTime?               @db.Timestamp(6)
+  icon                                     String?
+  banner                                   String?
+  status                                   String?                 @default("Draft")
+  minimum_attendance                       Int?
+  maximum_attendance                       Int?
+  optimal_attendance                       Int?
+  slug                                     String
+  creator                                  Int?
+  continuation_of                          Int?
+  scene                                    BigInt?
+  attendance_type                          String?
+  participant_type                         String?
+  invitation_type                          String?
+  Attendance                               Attendance[]
+  Event_Event_continuation_ofToEvent       Event?                  @relation("Event_continuation_ofToEvent", fields: [continuation_of], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_Event_Event_continuation_ofToEvent Event[]                 @relation("Event_continuation_ofToEvent")
+  Profile                                  Profile?                @relation(fields: [creator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Event                                    Event?                  @relation("EventToEvent", fields: [parent_event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_Event                              Event[]                 @relation("EventToEvent")
+  Scene                                    Scene?                  @relation(fields: [scene], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  EventFile                                EventFile[]
+  EventGroup                               EventGroup[]
+  EventInterest                            EventInterest[]
+  EventSchedule                            EventSchedule[]
+  EventStat                                EventStat[]
+  GroupEventAssociation                    GroupEventAssociation[]
+  Match                                    Match[]
 }
 
 model EventFile {
@@ -101,7 +109,7 @@ model Group {
   description           String?                 @db.VarChar
   avatar_url            String?                 @db.VarChar
   private               Boolean                 @default(false)
-  group_type            String                  @db.VarChar
+  group_type            String?                 @db.VarChar
   parent_group          Int?
   creation_date         DateTime                @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
   location              String?
@@ -187,7 +195,7 @@ model Profile {
   handle                                            String            @unique
   name                                              String            @db.VarChar
   pronouns                                          String?
-  updated_at                                        DateTime          @updatedAt
+  updated_at                                        DateTime?         @updatedAt
   parent_id                                         Int?
   Event                                             Event[]
   FriendRequest_FriendRequest_receiver_idToProfile  FriendRequest[]   @relation("FriendRequest_receiver_idToProfile")
@@ -242,22 +250,13 @@ model User {
   username                                 String                    @unique
   email                                    String                    @unique @db.VarChar
   notification_settings_id                 Int?
-  settings                                 String                    @default("none")
+  settings                                 String?                   @default("none")
   user_status                              String                    @default("active")
   current_profile_id                       Int?
+  Attendance                               Attendance[]
   Profile_Profile_parent_idToUser          Profile[]                 @relation("Profile_parent_idToUser")
   Profile_User_current_profile_idToProfile Profile?                  @relation("User_current_profile_idToProfile", fields: [current_profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   UserNotificationSettings                 UserNotificationSettings? @relation(fields: [notification_settings_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  UserEventInteraction                     UserEventInteraction[]
-}
-
-model UserEventInteraction {
-  id       Int    @id @default(autoincrement())
-  user_id  Int
-  event_id Int
-  status   String @db.VarChar
-  Event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User     User   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model UserNotificationSettings {
@@ -265,4 +264,34 @@ model UserNotificationSettings {
   email_notifications Boolean @default(true)
   push_notifications  Boolean @default(true)
   User                User[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Scene {
+  id          BigInt    @id @default(autoincrement())
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  name        String?
+  icon        String?
+  description String?
+  slug        String
+  Event       Event[]
+}
+
+model Attendance {
+  id         Int       @id(map: "UserEventInteraction_pkey") @default(autoincrement())
+  user_id    Int
+  event_id   Int
+  status     String
+  created_at DateTime? @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
+  updated_at DateTime? @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamptz(6)
+  Event      Event     @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum eventtype {
+  Tournament
+  Bracket
+  Game
+  Match
+  GeneralEvent
 }

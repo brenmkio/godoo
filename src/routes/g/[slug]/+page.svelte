@@ -19,4 +19,5 @@
 <p>Handle: {group.slug}</p>
 <p>Name: {group.name}</p>
 <p>Location: {group.location}</p>
+<a href="/edit-e/{group.slug}">EDIT GROUP</a>
 {/if}

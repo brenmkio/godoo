@@ -53,11 +53,9 @@
 
         }
 
-        if (inputElement) {
+        if (inputElement && document.activeElement === inputElement) {
             inputElement.blur()
-            if (document.activeElement === inputElement) {
-                inputElement.focus()
-            }
+            inputElement.focus()
         }
     }
 

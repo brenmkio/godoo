@@ -2,7 +2,7 @@ import { newGroupSchema } from "$lib/zod.js"
 import { setError, setMessage, superValidate } from "sveltekit-superforms/server"
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
-import { DB_addEvent, DB_addGroup } from "$lib/db"
+import { DB_addGroup } from "$lib/db_add"
 import type { Event, Group, Prisma } from "@prisma/client"
 import type { DBReturn } from "$lib/types"
 
@@ -62,7 +62,6 @@ export const actions: Actions = {
         const newGroupData: Prisma.GroupCreateInput = { 
             slug: "",
             name: "",
-            group_type: "",
         }
 
         if (form.data.name) {

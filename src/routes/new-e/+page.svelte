@@ -4,14 +4,19 @@
     import { superForm } from 'sveltekit-superforms/client'
     import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte'
     import { newEventSchema } from '$lib/zod';
+    import type { EventType } from '$lib/types';
 
     export let data: PageData
+
+    const events = data.events ?? []
+    const scene = data.scene
 
     let slugAvailable: boolean | null = null
     let inputElement: HTMLInputElement
 
     let hasBeenTouched = false
     let hasBeenSubmitted = false
+    let isContinuation = false
 
     const slugMax = 15
     const slugMin = 3
@@ -59,11 +64,9 @@
 
         }
 
-        if (inputElement) {
+        if (inputElement && document.activeElement === inputElement) {
             inputElement.blur()
-            if (document.activeElement === inputElement) {
-                inputElement.focus()
-            }
+            inputElement.focus()
         }
     }
 
@@ -89,7 +92,7 @@
 <SuperDebug data={$form} />
 
 
-<form method="POST" action="?/newEvent" class="flex flex-col w-64">
+<form method="POST" class="flex flex-col w-64 space-y-2">
     <label for="name">Slug</label>
     <input
         type="text"
@@ -159,6 +162,44 @@
         <p class="text-yellow-600">name must be {nameMax} characters or fewer</p>
     {/if}
 
+    {#if data.scene}
+        <p>Scene: {data.scene.name}</p>
+    {/if}
+
+    <label for="event_type">Event Type</label>  
+    <select 
+        name="event_type"
+        data-invalid={$errors.event_type}
+        on:input={otherInput}
+        bind:value={$form.event_type}
+        {...$constraints.event_type}
+        >
+        <option selected disabled value="null">Select an event type</option>
+        <option value="GeneralEvent">Event</option>
+        <option value="Game">Game</option>
+        <option value="Tournament">Tournament</option>
+    </select>
+    {#if $errors.event_type}
+        <p class="text-red-500">{$errors.event_type}</p>
+    {:else if $form.event_type !== "null"}
+        <p class="text-yellow-600">Please note: you won't be able to change this later!</p>
+    {/if}
+
+    <label>
+        <input type="checkbox" bind:checked={isContinuation} /> 
+        Is this event a continuation of another event?
+    </label>
+    {#if isContinuation}
+        <label>
+            Select the previous event:
+            <select bind:value={$form.continuation_of}>
+                <option disabled selected value=""> -- select an event -- </option>
+                {#each events as event (event.id)}
+                    <option value={event.id}>{event.name}</option>
+                {/each}
+            </select>
+        </label>
+    {/if}
 
     <label for="start_time">Start Time</label>
     <input

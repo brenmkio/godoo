@@ -1,7 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { DB_getAllProfiles } from '$lib/db';
-import type { Profile } from '@prisma/client';
-import { redirect } from '@sveltejs/kit';
+import { DB_getAllProfiles } from '$lib/db_get';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 

@@ -2,22 +2,30 @@ import { newEventSchema } from "$lib/zod.js"
 import { setError, setMessage, superValidate } from "sveltekit-superforms/server"
 import type { PageServerLoad } from "./$types"
 import { fail, type Actions, redirect } from "@sveltejs/kit"
-import { DB_addEvent } from "$lib/db"
-import type { Event, Prisma } from "@prisma/client"
+import { DB_getAllEventsProfileCanContinue, DB_getSceneBySlug } from "$lib/db_get"
+import { DB_addEvent } from "$lib/db_add"
+import type { Event, Prisma, Scene } from "@prisma/client"
 import type { DBReturn } from "$lib/types"
 
 export const load: PageServerLoad = async (event) => {
 
     // Server API:
 
-    if (!event.locals.user) {
+    if (!event.locals.profile) {
         throw redirect(303, "/")
     } 
 
+    const sceneSlug = event.url.searchParams.get('s') || ""
+    const sceneReturn = await DB_getSceneBySlug(sceneSlug)
 
     const form = await superValidate(event, newEventSchema)
 
-    return { form }
+    const eventReturn = await DB_getAllEventsProfileCanContinue(event.locals.profile.id)
+    if (eventReturn.db_error) {
+        return { form, error: eventReturn.db_error }
+    }
+
+    return { form, events: eventReturn.db_data, scene: sceneReturn.db_data }
 
     // can prepopulate with stuff from db: https://superforms.vercel.app/get-started
 
@@ -26,7 +34,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 
 
-    newEvent: async (event) => {
+    default: async (event) => {
 
         const form = await superValidate(event, newEventSchema)
         // form has: valid bool, errors obj, data obj, empty bool, constraints obj
@@ -38,17 +46,13 @@ export const actions: Actions = {
         // check handle availability
         let slugAvailable = false
 
-        if (form.data.slug === "QQQQQ") { // qqq
-            slugAvailable = true
+        const res = await event.fetch('/api/checkSlugAvailability?slug=' + form.data.slug + "&t=e")
+        const slugRes = await res.json()
+        if (!slugRes.available) {
+            setError(form, 'slug', 'This slug is already taken')
+            return fail(400, { form })
         } else {
-            const res = await event.fetch('/api/checkSlugAvailability?slug=' + form.data.slug + "&t=e")
-            const slugRes = await res.json()
-            if (!slugRes.available) {
-                setError(form, 'slug', 'This slug is already taken')
-                return fail(400, { form })
-            } else {
-                slugAvailable = true
-            }
+            slugAvailable = true
         }
 
 
@@ -65,10 +69,6 @@ export const actions: Actions = {
             Profile: {
                 connect: { id: profileId },
             },
-            end_time: "",
-            start_time: "",
-            location: "",
-            event_type: "",
         }
 
         if (form.data.name) {
@@ -101,6 +101,12 @@ export const actions: Actions = {
 
         if (Object.keys(form.errors).length > 0) {
             return fail(400, { form })
+        }
+
+        if (!form.data.event_type || form.data.event_type === "null") {
+            newEventData.event_type = "GeneralEvent"
+        } else {
+            newEventData.event_type = form.data.event_type
         }
 
         // update database
