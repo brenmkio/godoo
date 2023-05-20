@@ -1,8 +1,14 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { DB_getAllScenes } from '$lib/db_get';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 
-    throw redirect(303, "/scenes")
+    const sceneReturn = await DB_getAllScenes()
+    
+    if (sceneReturn.db_error) {
+        return { error: sceneReturn.db_error }
+    }
+
+    return { scenes: sceneReturn.db_data }
 
 }

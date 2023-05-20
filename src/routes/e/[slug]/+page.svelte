@@ -24,5 +24,5 @@
     <p>Continuation of {theEvent.continuation_of}</p>
   {/if}
   <p>Status: {theEvent.status}</p>
-  <a href="/edit-e/{theEvent.slug}">EDIT EVENT</a>
+  <a href="/e/{theEvent.slug}/edit">EDIT EVENT</a>
 {/if}

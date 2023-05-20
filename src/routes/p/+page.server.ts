@@ -1,8 +1,14 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { DB_getAllProfiles } from '$lib/db_get';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 
-    throw redirect(303, "/profiles")
+    const profileReturn = await DB_getAllProfiles()
+    
+    if (profileReturn.db_error) {
+        return { error: profileReturn.db_error }
+    }
+
+    return { profiles: profileReturn.db_data }
 
 }

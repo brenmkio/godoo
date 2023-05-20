@@ -72,3 +72,63 @@ export const editGroupSchema = z.object({
     location: z.string().max(50).optional(),
     group_id: z.number(),
 })
+
+export const rawStatTypeSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    category: z.string(),
+    activity: z.string().default("hockey"),
+    higher_is_better: z.boolean().optional(),
+})
+
+
+export const occurrenceTypeSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    activity: z.string().default("hockey"),
+    s1: z.number(),
+    v1: z.number(),
+    s2: z.number().optional(),
+    v2: z.number().optional(),
+    s3: z.number().optional(),
+    v3: z.number().optional(),
+    s4: z.number().optional(),
+    v4: z.number().optional(),
+    s5: z.number().optional(),
+    v5: z.number().optional(),
+    s6: z.number().optional(),
+    v6: z.number().optional(),
+    s7: z.number().optional(),
+    v7: z.number().optional(),
+    s8: z.number().optional(),
+    v8: z.number().optional(),
+    s9: z.number().optional(),
+    v9: z.number().optional(),
+    s10: z.number().optional(),
+    v10: z.number().optional(),
+    s11: z.number().optional(),
+    v11: z.number().optional(),
+    s12: z.number().optional(),
+    v12: z.number().optional(),
+    s13: z.number().optional(),
+    v13: z.number().optional(),
+    s14: z.number().optional(),
+    v14: z.number().optional(),
+    s15: z.number().optional(),
+    v15: z.number().optional(),
+})
+
+export const statTypeSchema = z.object({
+    name: z.string(),
+    shortform: z.string(),
+    description: z.string(),
+    category: z.string(),
+    activity: z.string().default("hockey"),
+    higher_is_better: z.boolean().optional(),
+    s1: z.number().optional(),
+    s2: z.number().optional(),
+    s3: z.number().optional(),
+    agg1: z.number().optional(),
+    agg2: z.number().optional(),
+    expression: z.string(),
+})

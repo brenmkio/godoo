@@ -1,5 +1,5 @@
 import prisma from '$lib/prisma'
-import type { Event, Group, Prisma, Profile, Scene, User } from '@prisma/client';
+import type { Event, Group, OccurrenceType, Prisma, Profile, RawStatType, Scene, StatType, User } from '@prisma/client';
 import type { DBReturn, DBError } from './types';
 
 
@@ -41,6 +41,15 @@ async function queryDB<T>({ queryFunc, name, err_msg, value }: {
 
 
 
+// USER
+// PROFILE
+// EVENT
+// GROUP
+// SCENE
+
+// RAW STAT TYPES 
+// STAT TYPES
+
 
 
 
@@ -72,6 +81,14 @@ export async function DB_getUserByEmail(email: string): Promise<DBReturn<User>> 
         value: email
     })
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -339,5 +356,86 @@ export async function DB_getAllScenes(): Promise<DBReturn<Scene[]>> {
 
 
 
+
+
+
+
+// RAW STAT TYPES
+
+
+export async function DB_getAllRawStatTypesFromActivity(activity: string): Promise<DBReturn<RawStatType[]>> {
+    return queryDB({
+        queryFunc: (activity) => prisma.rawStatType.findMany({
+            where: { activity }
+        }),
+        name: 'all raw stat types from activity',
+        err_msg: `No raw stat type from activity ${activity} was found`,
+        value: activity
+    })
+}
+
+
+export async function DB_getAllRawStatTypesFromOccurrenceTypes(occurrenceTypeIdStrs: string[]): Promise<DBReturn<RawStatType[]>> {
+
+    const occurrenceTypeIds = occurrenceTypeIdStrs.map(Number)
+
+    try {
+        const statModifiers = await prisma.statModifier.findMany({
+            where: {
+                occurrence_type_id: {
+                    in: occurrenceTypeIds
+                }
+            },
+            include: {
+                RawStatType: true
+            }
+        })
+        
+        const rawStatTypes: RawStatType[] = statModifiers.map(modifier => modifier.RawStatType).filter((rawStatType): rawStatType is RawStatType => rawStatType !== null)
+
+        return { db_data: rawStatTypes, db_error: null }
+    } catch (error) {
+        return { 
+            db_data: null, 
+            db_error: { 
+              statusCode: 500,
+              name: `get raw stat types from occurrence types error`,
+              message: `There was a problem getting raw stat types from occurrence types: ${String(error)}`,
+            } 
+        }
+    }
+}
+
+
+
+// STAT TYPES
+
+
+export async function DB_getAllStatTypesFromActivity(activity: string): Promise<DBReturn<StatType[]>> {
+    return queryDB({
+        queryFunc: (activity) => prisma.statType.findMany({
+            where: { activity }
+        }),
+        name: 'all stat types from activity',
+        err_msg: `No stat type from activity ${activity} was found`,
+        value: activity
+    })
+}
+
+
+
+// OCCURRENCE TYPES
+
+
+export async function DB_getAllOccurrenceTypesFromActivity(activity: string): Promise<DBReturn<OccurrenceType[]>> {
+    return queryDB({
+        queryFunc: (activity) => prisma.occurrenceType.findMany({
+            where: { activity }
+        }),
+        name: 'all occurrence types from activity',
+        err_msg: `No occurrence type from activity ${activity} was found`,
+        value: activity
+    })
+}
 
 

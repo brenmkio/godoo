@@ -27,3 +27,14 @@ export function myBaseURL() {
     }
     return prodURL
 }
+
+export function str(data: any) {
+    let ret = JSON.stringify(data, function(key, value) {
+        if (typeof value === 'bigint') {
+          return value.toString()
+        } else {
+          return value;
+        }
+    })
+    return ret
+}

@@ -1,5 +1,5 @@
 import prisma from '$lib/prisma'
-import type { Event, Group, Prisma, Profile, Scene, User } from '@prisma/client';
+import type { Event, Group, OccurrenceType, Prisma, Profile, RawStatType, Scene, StatModifier, StatType, User } from '@prisma/client';
 import type { DBReturn, DBError } from './types';
 
 
@@ -49,6 +49,11 @@ async function queryDB<T>({ queryFunc, name, err_msg, value }: {
 // add profile
 // add event
 // add group
+// add scene
+
+// add raw stat type
+// add occurrence type
+// add stat type
 
 
 
@@ -136,6 +141,83 @@ export async function DB_addProfile(data: Prisma.ProfileCreateInput): Promise<DB
           statusCode: 500,
           name: `add scene error`,
           message: `add scene error: ${String(error)}`,
+        } 
+      }
+    }
+  }
+
+
+
+
+  export async function DB_addRawStatType(data: Prisma.RawStatTypeCreateInput): Promise<DBReturn<RawStatType>> {
+    try {
+      const newRawStat = await prisma.rawStatType.create({ data });
+  
+      return { db_data: newRawStat, db_error: null };
+    } catch (error) {
+      return { 
+        db_data: null,
+        db_error: { 
+          statusCode: 500,
+          name: `add rawStat error`,
+          message: `add rawStat error: ${String(error)}`,
+        } 
+      }
+    }
+  }
+
+
+  export async function DB_addOccurrenceType(data: Prisma.OccurrenceTypeCreateInput): Promise<DBReturn<OccurrenceType>> {
+    try {
+      const newOccurrenceType = await prisma.occurrenceType.create({ data });
+  
+      return { db_data: newOccurrenceType, db_error: null };
+    } catch (error) {
+      return { 
+        db_data: null,
+        db_error: { 
+          statusCode: 500,
+          name: `add occurrenceType error`,
+          message: `add occurrenceType error: ${String(error)}`,
+        } 
+      }
+    }
+  }
+
+
+
+  export async function DB_addStatModifier(data: Prisma.StatModifierCreateInput): Promise<DBReturn<StatModifier>> {
+    try {
+      const newstatModifier = await prisma.statModifier.create({ data });
+  
+      return { db_data: newstatModifier, db_error: null };
+    } catch (error) {
+      return { 
+        db_data: null,
+        db_error: { 
+          statusCode: 500,
+          name: `add statModifier error`,
+          message: `add statModifier error: ${String(error)}`,
+        } 
+      }
+    }
+  }
+
+
+
+
+  export async function DB_addStatType(data: Prisma.StatTypeCreateInput): Promise<DBReturn<StatType>> {
+    try {
+      const newStatType = await prisma.statType.create({ data });
+  
+      return { db_data: newStatType, db_error: null };
+    } catch (error) {
+      return { 
+        db_data: null,
+        db_error: { 
+          statusCode: 500,
+          name: `add StatType error`,
+          message: `add StatType error: ${String(error)}`,
         } 
       }
     }

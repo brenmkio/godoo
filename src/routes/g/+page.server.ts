@@ -1,8 +1,16 @@
 import type { PageServerLoad } from './$types';
+import { DB_getAllGroups } from '$lib/db_get';
+import type { Group } from '@prisma/client';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 
-    throw redirect(303, "/groups")
+    const groupReturn = await DB_getAllGroups()
+    
+    if (groupReturn.db_error) {
+        return { error: groupReturn.db_error }
+    }
+
+    return { groups: groupReturn.db_data }
 
 }
